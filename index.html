@@ -1209,7 +1209,7 @@ async function realStore() {
 }
 
 (async function boot() {
-  if (route === 'host') {
+  if (route === 'host' || (route !== 'play' && route !== 'demo')) {
     document.body.classList.add('lock');
     Host(app, await realStore(), { demo: false, deck: true });
   } else if (route === 'play') {
