@@ -367,7 +367,7 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--red); outli
 /* ---------- 시작 화면 ---------- */
 .launch { min-height: 100%; display: flex; flex-direction: column; justify-content: center; gap: 32px; max-width: 880px; margin: 0 auto; padding-block: 48px; }
 .launch h1 { font-size: clamp(40px, 8vw, 84px); font-weight: 900; letter-spacing: -0.04em; line-height: 1.05; }
-.lgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 14px; }
+.lgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 14px; }
 .lbtn { display: flex; flex-direction: column; gap: 10px; text-align: left; padding: 26px; border-radius: 26px; background: var(--glass); border: 1px solid var(--line); text-decoration: none; color: var(--fg); }
 .lbtn:hover { border-color: rgba(255,59,48,.6); }
 .lbtn b { font-size: 26px; letter-spacing: -0.02em; }
@@ -754,7 +754,7 @@ class FireStore {
 function Host(root, store, opts) {
   root.innerHTML = `<div class="host">
     <div class="viewport"><div class="stage"><div class="view"></div><div class="tbar" hidden><i></i></div>${opts.deck ? '<div class="deck" hidden></div>' : ''}</div></div>
-    ${store.demo ? '<span class="modetag">시연 모드</span>' : ''}
+    ${store.demo ? '<span class="modetag">실시간 연결 안 됨 · 인터넷을 확인해 주세요</span>' : ''}
     <div class="hud">
       <span class="hphase"></span>
       <button type="button" data-act="prev">이전</button>
@@ -1056,7 +1056,7 @@ function Tablet(root, store, opts) {
     const taken = new Set(Object.values(st.teams || {}).map(t => t.name));
     return `<div class="tcard"><p class="tey">애플데이 퀴즈 대회</p><p class="tbig">우리 팀 사자성어를 골라요.</p><p class="tmuted">짝 찾기에서 맞춘 사자성어를 누르세요. 다른 팀이 이미 고른 이름은 고를 수 없어요.</p></div>
       <div class="picker">${IDIOMS.map((n, i) => `<button type="button" class="pk" data-pick="${i}" ${taken.has(n) ? 'disabled' : ''}>${n}${taken.has(n) ? '<small>참가 중</small>' : ''}</button>`).join('')}</div>
-      <p class="tmsg" data-live="msg"></p>${store.demo && !opts.memoryOnly ? '<p class="tbanner">시연 모드 · Firebase를 연결하면 여러 태블릿이 함께 참여할 수 있어요</p>' : ''}`;
+      <p class="tmsg" data-live="msg"></p>${store.demo && !opts.memoryOnly ? '<p class="tbanner">실시간 연결이 안 됐어요. 와이파이를 확인하고 새로고침해 주세요.</p>' : ''}`;
   }
   function vWait(m) {
     if (m.phase === 'intro') {
@@ -1237,11 +1237,10 @@ async function realStore() {
       <p class="eyebrow" style="font-size:16px">2026 Apple Day · 고흥대서중학교</p>
       <h1 class="grad">애플데이<br>퀴즈 대회</h1>
       <div class="lgrid">
-        <a class="lbtn main" href="#demo"><b>시연해 보기</b><span>송출 화면과 태블릿 두 대를 한 화면에서 미리 돌려 봐요.</span></a>
-        <a class="lbtn" href="#host"><b>송출 화면 (선생님)</b><span>표지부터 퀴즈, 마무리 인사까지 한 화면으로 진행해요. 도서관 큰 화면으로 내보내요.</span></a>
-        <a class="lbtn" href="#play"><b>태블릿 참가</b><span>학생 태블릿용 화면이에요. 보통은 QR로 들어와요.</span></a>
+        <a class="lbtn main" href="#host"><b>송출 화면 (선생님)</b><span>표지부터 퀴즈, 마무리 인사까지 한 화면으로 진행해요. 도서관 큰 화면으로 내보내요.</span></a>
+        <a class="lbtn" href="#play"><b>태블릿 참가 (학생)</b><span>학생 태블릿용 화면이에요. 보통은 송출 화면의 QR로 바로 들어와요.</span></a>
       </div>
-      <p class="lstatus">${CONFIG.firebase ? '실시간 연결: Firebase 사용 중' : '실시간 연결: 아직 Firebase 설정 전이라 기기끼리 연결되지 않아요. 시연은 바로 가능해요.'}</p></div>`;
+      <p class="lstatus">${CONFIG.firebase ? '실시간 연결 준비 완료' : '실시간 연결이 설정되지 않았어요.'}</p></div>`;
   }
 })();
 })();
