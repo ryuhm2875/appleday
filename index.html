@@ -629,16 +629,16 @@ const QUESTIONS = [
       [S('circle','blue',0), S('square','red',2), S('star','yellow',4), S('triangle','green',6), S('circle','red',8)],
       [S('circle','red',0), S('square','blue',2), S('star','green',4), S('triangle','yellow',6), S('circle','blue',8)],
       [S('circle','red',0), S('square','blue',2), S('star','yellow',4), S('triangle','green',6), S('circle','blue',8)] ] },
-  // 12~19 인물 퀴즈
-  ...['박준희', '이내영', '박지호', '조성준', '하정훈', '이진혁', '이정율', '정상룡'].map((name, k) => ({ round: 2, type: 'text', kind: '인물 퀴즈', video: `media/p${k + 1}.mp4`, answer: name, time: TP })),
-  // 20~26 학생 설문
+  // 12~18 학생 설문
   { round: 2, type: 'text', kind: '학생 설문', prompt: '고흥대서중 학생들이 1교시 수업으로 가장 원하는 과목은?', answer: '체육', time: TS_ },
   { round: 2, type: 'text', kind: '학생 설문', prompt: '고흥대서중 학생들의 최애 급식 메뉴 1위는?', answer: '치킨', time: TS_ },
   { round: 2, type: 'text', kind: '학생 설문', prompt: '고흥대서중 학생들이 두 번째로 좋아하는 시간은?', answer: '점심시간', time: TS_ },
   { round: 2, type: 'text', kind: '학생 설문', prompt: '고흥대서중 학생들이 뽑은 가장 말이 많은 학생은?', answer: '박시우', time: TS_ },
   { round: 2, type: 'text', kind: '학생 설문', prompt: '고흥대서중 학생들이 뽑은 가장 착한 학생은?', answer: '정상룡', time: TS_ },
   { round: 2, type: 'text', kind: '학생 설문', prompt: '고흥대서중 학생들이 가장 좋아하는 장소는?', answer: '체육관', time: TS_ },
-  { round: 2, type: 'text', kind: '학생 설문', prompt: '고흥대서중 학생들이 가장 원하는 장소는?', answer: '매점', time: TS_ }
+  { round: 2, type: 'text', kind: '학생 설문', prompt: '고흥대서중 학생들이 가장 원하는 장소는?', answer: '매점', time: TS_ },
+  // 19~26 인물 퀴즈
+  ...['박준희', '이내영', '박지호', '조성준', '하정훈', '이진혁', '이정율', '정상룡'].map((name, k) => ({ round: 2, type: 'text', kind: '인물 퀴즈', video: `media/p${k + 1}.mp4`, answer: name, time: TP }))
 ];
 const NQ = QUESTIONS.length;
 const R1N = QUESTIONS.filter(q => q.round === 1).length;
@@ -895,7 +895,7 @@ function Host(root, store, opts) {
         <div class="role glass rise" style="--d:4"><span class="tag">답 입력하는 사람</span><p class="t">화면을 등지고<br>답만 눌러요</p><p class="d">짝의 설명만 듣고 정답 선택<br>화면을 돌아보면 안 돼요</p></div>
       </div>`;
     return `<div class="center"><p class="eyebrow rise">2라운드 · ${R1N + 1}번 ~ ${NQ}번</p><h2 class="h-big grad rise" style="--d:1">동고동락 라운드.</h2><p class="lead rise" style="--d:2">이제는 <b>둘이 함께</b> 화면을 보며 풀어요. 정답은 직접 입력해요.</p>
-      <div class="chips rise" style="--d:3"><span class="chip">인물 퀴즈 <b>8문제</b></span><span class="chip">학생 설문 <b>7문제</b></span><span class="chip">정확한 답만 <b>정답</b></span></div></div>`;
+      <div class="chips rise" style="--d:3"><span class="chip">학생 설문 <b>7문제</b></span><span class="chip">인물 퀴즈 <b>8문제</b></span><span class="chip">정확한 답만 <b>정답</b></span></div></div>`;
   }
   function vQuestion(i, q) {
     const live = `<div class="live"><span class="sub"><b data-live="count">0</b> / <span data-live="teams">0</span>팀 제출</span><span class="timer" data-live="timer">${q.time}</span></div>`;
