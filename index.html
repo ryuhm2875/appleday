@@ -165,8 +165,8 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--red); outli
 .s-award .glow { width: 1300px; height: 1300px; left: 310px; top: -110px; }
 .s-award > :not(.glow) { position: relative; }
 .prizepill { font-size: 44px; font-weight: 800; padding: 22px 56px; border-radius: 999px; background: var(--red); color: #fff; }
-.ftable { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 40px; margin-top: 48px; grid-auto-flow: column; }
-.frow { display: grid; grid-template-columns: 80px minmax(0, 1fr) auto; align-items: center; gap: 16px; padding: 14px 32px; border-radius: 22px; background: var(--glass); font-size: 38px; }
+.ftable { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 40px; margin-top: 32px; grid-auto-flow: column; }
+.frow { display: grid; grid-template-columns: 80px minmax(0, 1fr) auto; align-items: center; gap: 16px; padding: 8px 28px; border-radius: 20px; background: var(--glass); font-size: 34px; }
 .frow .rk { color: var(--muted); font-weight: 800; font-variant-numeric: tabular-nums; }
 .frow .nm { font-weight: 800; }
 .frow .sc { font-weight: 800; font-variant-numeric: tabular-nums; }
@@ -951,7 +951,7 @@ function Host(root, store, opts) {
         <span class="prizepill rise" style="--d:4">${prize}</span></div>`;
     }
     const sp = n >= 5 ? rows[n - 2].id : null;
-    return `<div class="head"><p class="eyebrow rise">Final · 전체 순위</p><h2 class="h-title rise" style="--d:1">모두 수고했어요.</h2></div>
+    return `<div class="head"><p class="eyebrow rise">Final · 전체 순위</p><h2 class="h-title rise" style="--d:1;font-size:72px">모두 수고했어요.</h2></div>
       <div class="ftable rise" style="--d:2;grid-template-rows:repeat(${Math.max(1, Math.ceil(n / 2))}, auto)">${rows.map((r, k) => {
         const pz = k < 3 ? PRIZE[k + 1] : (r.id === sp ? PRIZE.sp : '');
         return `<div class="frow ${pz ? 'top' : ''}"><span class="rk">${k + 1}</span><span class="nm">${esc(r.name)}${pz ? `<span class="pz">${pz}</span>` : ''}</span><span class="sc">${r.score}</span></div>`;
