@@ -109,6 +109,8 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--red); outli
 .cho.sm { gap: 22px; }
 .cho.sm span { width: 190px; height: 230px; font-size: 140px; border-radius: 36px; }
 .cho i { width: 40px; flex: none; }
+.cho.xs { gap: 14px; }
+.cho.xs span { width: 150px; height: 190px; font-size: 108px; border-radius: 28px; }
 .emo { white-space: nowrap; font-family: var(--emoji); font-size: 260px; line-height: 1.15; letter-spacing: .1em; }
 .qsplit { flex: 1; display: flex; align-items: center; gap: 100px; min-height: 0; }
 .qsplit .copy { flex: 1; display: flex; flex-direction: column; gap: 40px; min-width: 0; }
@@ -616,8 +618,9 @@ const QUESTIONS = [
   { round: 1, type: 'mc', kind: '문제 전달', prompt: '애플데이의 날짜는?', options: ['10월 4일', '10월 14일', '10월 24일', '11월 4일'], answer: 2, time: T1 },
   { round: 1, type: 'mc', kind: '문제 전달', prompt: '일주일 동안 우리가 듣는 수업은 총 몇 교시일까요?', options: ['28교시', '30교시', '32교시', '34교시'], answer: 2, time: T1 },
   { round: 1, type: 'mc', kind: '초성 전달', cho: 'ㄴㄹㅇㅈㅅㅌ', options: ['나라연구센터', '나로우주센터', '누리호발사대', '남해안전시관'], answer: 1, time: T1 },
-  { round: 1, type: 'mc', kind: '초성 전달', cho: 'ㅅㄴㅇㄷ', options: ['소나기', '성탄제', '소음공해', '수난이대'], answer: 3, time: T1 },
-  { round: 1, type: 'mc', kind: '초성 전달', cho: 'ㅎㄴㅇ ㅁㄱㅁ', options: ['하늘은 맑건만', '하늘과 바람과 별과 시', '학마을 사람들', '홍길동전'], answer: 0, time: T1 },
+  { round: 1, type: 'mc', kind: '초성 전달', cho: 'ㅅㄹㅎㄷ', options: ['사과한다', '사랑해요', '서로 돕다', '사랑한다'], answer: 3, time: T1 },
+  { round: 1, type: 'mc', kind: '초성 전달', cho: 'ㅈㅅㄱㄹㅂㄷㅅㅅㄴ', options: ['자상한 류봉두 선생님', '잘생긴 류봉두 선배님', '잘생긴 류봉두 선생님', '재치 있는 류봉두 선생님'], answer: 2, time: T1 },
+  { round: 1, type: 'mc', kind: '초성 전달', cho: 'ㄱㅎㄷㅅㅈㅎㄱㅍㅇㅌ', options: ['고흥대서중학교 파이팅', '고흥도화중학교 파이팅', '고흥대서초등학교 파이팅', '고흥동강중학교 파이팅'], answer: 0, time: T1 },
   { round: 1, type: 'mc', kind: '속담 이모지', emoji: '🐒🌳⬇️', options: ['고래 싸움에 새우 등 터진다', '까마귀 날자 배 떨어진다', '원숭이도 나무에서 떨어진다', '개구리 올챙이 적 생각 못 한다'], answer: 2, time: T1 },
   { round: 1, type: 'mc', kind: '속담 이모지', emoji: '🐄💨🏚️🔨', options: ['소 귀에 경 읽기', '쇠뿔도 단김에 빼라', '누워서 떡 먹기', '소 잃고 외양간 고친다'], answer: 3, time: T1 },
   { round: 1, type: 'mc', kind: '속담 이모지', emoji: '☀️🗣️🐦 🌙🗣️🐭', options: ['가는 말이 고와야 오는 말이 곱다', '낮말은 새가 듣고 밤말은 쥐가 듣는다', '발 없는 말이 천 리 간다', '말 한마디로 천 냥 빚을 갚는다'], answer: 1, time: T1 },
@@ -917,7 +920,7 @@ function Host(root, store, opts) {
     const live = `<div class="live"><span class="sub"><b data-live="count">0</b> / <span data-live="teams">0</span>팀 제출</span><span class="timer" data-live="timer">${q.time}</span></div>`;
     let body;
     if (q.draw) body = `<div class="qsplit"><div class="copy"><h2 class="h-title rise" style="--d:1">이 그림을<br>말로 설명해요.</h2><p class="lead rise" style="--d:2">도형의 <b>모양, 색, 위치</b>를 말로 전해요.<br>짝은 태블릿의 그림 4장 중에서 골라요.</p></div><div class="board glass rise" style="--d:2">${shapeSvg(q.options[q.answer])}</div></div>`;
-    else if (q.cho) body = `<div class="qcenter"><p class="lead rise" style="--d:1">초성만 소리 내어 읽어 주세요. <b>낱말을 말하면 안 돼요.</b></p><div class="cho ${q.cho.replace(/ /g, '').length > 5 ? 'sm' : ''} rise" style="--d:2">${[...q.cho].map(c => c === ' ' ? '<i></i>' : `<span class="glass">${c}</span>`).join('')}</div></div>`;
+    else if (q.cho) body = `<div class="qcenter"><p class="lead rise" style="--d:1">초성만 소리 내어 읽어 주세요. <b>낱말을 말하면 안 돼요.</b></p><div class="cho ${q.cho.replace(/ /g, '').length > 7 ? 'xs' : q.cho.replace(/ /g, '').length > 5 ? 'sm' : ''} rise" style="--d:2">${[...q.cho].map(c => c === ' ' ? '<i></i>' : `<span class="glass">${c}</span>`).join('')}</div></div>`;
     else if (q.emoji) body = `<div class="qcenter"><p class="lead rise" style="--d:1">이모지를 보고 떠오르는 <b>속담</b>을 설명해요. 속담을 그대로 말하면 안 돼요.</p><div class="emo ${q.emoji.length > 12 ? 'sm' : ''} rise" style="--d:2">${q.emoji}</div></div>`;
     else if (q.video) body = `<div class="qsplit"><div class="vframe rise" style="--d:1"><video src="${q.video}#t=0.05" muted playsinline preload="auto"></video></div><div class="copy"><p class="eyebrow rise">인물 퀴즈</p><h2 class="h-big grad rise" style="--d:1">누구일까요?</h2><p class="lead rise" style="--d:2">태블릿에 <b>이름을 정확하게</b> 입력해요.<br>띄어쓰기는 상관없어요.</p></div></div>`;
     else body = `<div class="qcenter"><p class="prompt grad rise" style="--d:1">${esc(q.prompt)}</p><p class="lead rise" style="--d:2">${q.round === 1 ? '문제를 보는 사람이 짝에게 읽어 주세요. <b>보기는 짝의 태블릿에만</b> 있어요.' : '둘이 상의해서 태블릿에 <b>정답을 입력</b>해요.'}</p></div>`;
