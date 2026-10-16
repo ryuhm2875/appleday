@@ -157,6 +157,13 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--red); outli
 .rrow .sc { justify-self: end; font-size: 60px; font-weight: 900; font-variant-numeric: tabular-nums; }
 .rrow.first { background: linear-gradient(160deg, #FF5147, #C8160C); border-color: transparent; box-shadow: 0 30px 80px rgba(255,59,48,.3); }
 .rrow.first .rk, .rrow.first .gain { color: rgba(255,255,255,.85); }
+.view.v-reveal, .view.v-qboard, .view.v-board { padding-bottom: 150px; }
+.v-reveal .vframe video { height: 660px; }
+.snav { position: absolute; right: 120px; bottom: 56px; display: flex; gap: 14px; z-index: 2; }
+.snav button { font: 700 28px var(--font); padding: 16px 32px; border-radius: 999px; background: var(--glass); border: 1px solid var(--line); color: var(--muted); cursor: pointer; }
+.snav button:hover { color: var(--fg); border-color: rgba(255,255,255,.3); }
+.snav button.on { color: var(--fg); background: var(--glass-2); border-color: rgba(255,255,255,.35); }
+.snav button.go { background: var(--red); border-color: var(--red); color: #fff; }
 .empty { font-size: 44px; color: var(--muted); margin-top: 80px; }
 .nexthint { margin-top: auto; font-size: 30px; color: var(--dim); }
 
@@ -637,8 +644,8 @@ const QUESTIONS = [
   { round: 2, type: 'text', kind: '학생 설문', prompt: '고흥대서중 학생들이 뽑은 가장 착한 학생은?', answer: '정상룡', time: TS_ },
   { round: 2, type: 'text', kind: '학생 설문', prompt: '고흥대서중 학생들이 가장 좋아하는 장소는?', answer: '체육관', time: TS_ },
   { round: 2, type: 'text', kind: '학생 설문', prompt: '고흥대서중 학생들이 가장 원하는 장소는?', answer: '매점', time: TS_ },
-  // 19~26 인물 퀴즈
-  ...['박준희', '이내영', '박지호', '조성준', '하정훈', '이진혁', '이정율', '정상룡'].map((name, k) => ({ round: 2, type: 'text', kind: '인물 퀴즈', video: `media/p${k + 1}.mp4`, answer: name, time: TP }))
+  // 19~28 인물 퀴즈
+  ...['박준희', '이내영', '박지호', '조성준', '하정훈', '이진혁', '이정율', '정상룡', '박시우', '이재호'].map((name, k) => ({ round: 2, type: 'text', kind: '인물 퀴즈', video: `media/p${k + 1}.mp4`, answer: name, time: TP }))
 ];
 const NQ = QUESTIONS.length;
 const R1N = QUESTIONS.filter(q => q.round === 1).length;
@@ -823,7 +830,8 @@ function Host(root, store, opts) {
       case 'intro': startQ(m.q + 1); break;
       case 'question': store.update({ 'meta/phase': 'closed' }); break;
       case 'closed': store.update({ 'meta/phase': 'reveal' }); break;
-      case 'reveal': store.update({ 'meta/phase': 'board' }); break;
+      case 'reveal': store.update({ 'meta/phase': 'qboard' }); break;
+      case 'qboard': store.update({ 'meta/phase': 'board' }); break;
       case 'board': {
         const n = m.q + 1;
         if (n >= NQ) store.update({ 'meta/phase': 'final', 'meta/fstep': 0 });
@@ -838,11 +846,19 @@ function Host(root, store, opts) {
     if (deck && mode !== 'quiz') return deckPrev();
     const m = meta(st);
     if (deck && m.phase === 'lobby') { mode = 'pre'; di = pre.length - 1; return showDeck(); }
-    if (m.phase === 'board') store.update({ 'meta/phase': 'reveal' });
+    if (m.phase === 'board') store.update({ 'meta/phase': 'qboard' });
+    else if (m.phase === 'qboard') store.update({ 'meta/phase': 'reveal' });
     else if (m.phase === 'reveal') store.update({ 'meta/phase': 'closed' });
     else if (m.phase === 'final' && m.fstep > 0) store.update({ 'meta/fstep': m.fstep - 1 });
     else if (m.phase === 'final') store.update({ 'meta/phase': 'board', 'meta/q': NQ - 1 });
   }
+  function skip() {
+    const m = meta(st);
+    if (!['reveal', 'qboard', 'board'].includes(m.phase)) return;
+    store.update({ 'meta/phase': 'board' }).then(() => { st.meta = Object.assign({}, st.meta, { phase: 'board' }); next(); });
+  }
+  function goQb() { if (['reveal', 'board'].includes(meta(st).phase)) store.update({ 'meta/phase': 'qboard' }); }
+  function goTb() { if (['reveal', 'qboard'].includes(meta(st).phase)) store.update({ 'meta/phase': 'board' }); }
   function reset() {
     if (Date.now() - resetArm < 3000) { resetArm = 0; resetBtn.textContent = '초기화'; resetBtn.classList.remove('warn'); store.remove(''); return; }
     resetArm = Date.now(); resetBtn.textContent = '한 번 더 누르면 모두 지워져요'; resetBtn.classList.add('warn');
@@ -857,7 +873,7 @@ function Host(root, store, opts) {
       if (deck && mode !== 'quiz' && e.target.closest('.viewport')) { const r = vp.getBoundingClientRect(); (e.clientX - r.left < r.width * 0.3) ? deckPrev() : deckNext(); }
       return;
     }
-    ({ next, prev, full, reset, start: next })[b.dataset.act]?.();
+    ({ next, prev, full, reset, skip, goQb, goTb, start: next })[b.dataset.act]?.();
   });
   document.addEventListener('keydown', e => {
     if (e.target.closest('input, textarea, .devframe')) return;
@@ -895,7 +911,7 @@ function Host(root, store, opts) {
         <div class="role glass rise" style="--d:4"><span class="tag">답 입력하는 사람</span><p class="t">화면을 등지고<br>답만 눌러요</p><p class="d">짝의 설명만 듣고 정답 선택<br>화면을 돌아보면 안 돼요</p></div>
       </div>`;
     return `<div class="center"><p class="eyebrow rise">2라운드 · ${R1N + 1}번 ~ ${NQ}번</p><h2 class="h-big grad rise" style="--d:1">동고동락 라운드.</h2><p class="lead rise" style="--d:2">이제는 <b>둘이 함께</b> 화면을 보며 풀어요. 정답은 직접 입력해요.</p>
-      <div class="chips rise" style="--d:3"><span class="chip">학생 설문 <b>7문제</b></span><span class="chip">인물 퀴즈 <b>8문제</b></span><span class="chip">정확한 답만 <b>정답</b></span></div></div>`;
+      <div class="chips rise" style="--d:3"><span class="chip">학생 설문 <b>${QUESTIONS.filter(q => q.kind === '학생 설문').length}문제</b></span><span class="chip">인물 퀴즈 <b>${QUESTIONS.filter(q => q.video).length}문제</b></span><span class="chip">정확한 답만 <b>정답</b></span></div></div>`;
   }
   function vQuestion(i, q) {
     const live = `<div class="live"><span class="sub"><b data-live="count">0</b> / <span data-live="teams">0</span>팀 제출</span><span class="timer" data-live="timer">${q.time}</span></div>`;
@@ -908,7 +924,8 @@ function Host(root, store, opts) {
     const foot = q.round === 1 ? `<div class="r1foot rise" style="--d:3"><span class="pill-red">이심전심</span><p>답을 누르는 사람은 화면을 등지고 앉아요.</p></div>` : '';
     return head(i, q, live) + body + foot + `<div class="closedbadge">마감 · 곧 정답을 공개해요</div>`;
   }
-  function vReveal(i, q) {
+  function vReveal(i, q) { return vReveal0(i, q) + snav(i, 'reveal'); }
+  function vReveal0(i, q) {
     const a = (st.answers || {})[i] || {}, vals = Object.values(a), nT = cnt(st.teams);
     const nOk = vals.filter(x => isCorrect(q, x.v)).length;
     const right = `<div class="live"><span class="sub">정답 <b>${nOk}</b> / ${nT}팀</span></div>`;
@@ -928,12 +945,30 @@ function Host(root, store, opts) {
         <div class="copy"><p class="eyebrow">정답</p><p class="h-big grad pname">${esc(q.answer)}</p>${subs}</div></div>`;
     return head(i, q, right) + `<p class="rtitle rise" style="--d:1">${esc(q.prompt)}</p><div class="ansrow rise" style="--d:2"><span class="ansbig">${esc(q.answer)}</span></div>${subs}`;
   }
+  function snav(i, cur) {
+    const last = i + 1 >= NQ;
+    const nxt = last ? '최종 결과' : (QUESTIONS[i + 1].round !== QUESTIONS[i].round ? '2라운드' : `Q${pad(i + 2)}`);
+    return `<div class="snav">
+      <button type="button" data-act="goQb" class="${cur === 'qboard' ? 'on' : ''}">이번 문제 순위</button>
+      <button type="button" data-act="goTb" class="${cur === 'board' ? 'on' : ''}">전체 순위</button>
+      <button type="button" data-act="skip" class="go">${nxt} ▶</button></div>`;
+  }
+  function vQBoard(i) {
+    const q = QUESTIONS[i], a = (st.answers || {})[i] || {}, start = (st.starts || {})[i];
+    const rows = scoreboard(st, i).filter(r => r.gains[i] > 0)
+      .map(r => Object.assign({}, r, { at: a[r.id] ? a[r.id].at : 0 }))
+      .sort((x, y) => y.gains[i] - x.gains[i] || x.at - y.at);
+    const top = rows.slice(0, 5);
+    return `<div class="head"><p class="eyebrow rise">Q${pad(i + 1)} · ${q.kind} · 정답 ${rows.length}팀</p><h2 class="h-title rise" style="--d:1;font-size:84px">이번 문제 TOP 5</h2></div>
+      ${top.length ? `<div class="rlist">${top.map((r, k) => `<div class="rrow ${k === 0 ? 'first' : ''} rise" style="--d:${k + 2}"><span class="rk">${k + 1}</span><span class="nm">${esc(r.name)}</span><span class="gain">${start && r.at ? ((r.at - start) / 1000).toFixed(1) + '초' : ''}</span><span class="sc">+${r.gains[i]}</span></div>`).join('')}</div>` : '<p class="empty">이번 문제를 맞힌 팀이 없어요.</p>'}
+      ${snav(i, 'qboard')}`;
+  }
   function vBoard(i) {
     const rows = scoreboard(st, i), top = rows.slice(0, 5);
     const nxt = i + 1 >= NQ ? '다음: 최종 결과 발표' : (QUESTIONS[i + 1].round !== QUESTIONS[i].round ? '다음: 2라운드 동고동락' : `다음: Q${pad(i + 2)}`);
     return `<div class="head"><p class="eyebrow rise">Q${pad(i + 1)} 결과 · 참가 ${rows.length}팀</p><h2 class="h-title rise" style="--d:1;font-size:84px">지금 순위 TOP 5</h2></div>
       ${top.length ? `<div class="rlist">${top.map((r, k) => `<div class="rrow ${k === 0 ? 'first' : ''} rise" style="--d:${k + 2}"><span class="rk">${k + 1}</span><span class="nm">${esc(r.name)}</span><span class="gain">${r.gains[i] ? '+' + r.gains[i] : ''}</span><span class="sc">${r.score}</span></div>`).join('')}</div>` : '<p class="empty">아직 참가한 팀이 없어요.</p>'}
-      <p class="nexthint">${nxt}</p>`;
+      ${snav(i, 'board')}`;
   }
   function vFinal(step) {
     const rows = scoreboard(st, NQ - 1), n = rows.length;
@@ -965,6 +1000,7 @@ function Host(root, store, opts) {
       case 'intro': return 'intro' + m.q;
       case 'question': case 'closed': return 'q' + m.q;
       case 'reveal': return 'r' + m.q;
+      case 'qboard': return 'qb' + m.q;
       case 'board': return 'b' + m.q;
       case 'final': return 'f' + m.fstep;
     }
@@ -979,6 +1015,7 @@ function Host(root, store, opts) {
       else if (m.phase === 'intro') html = vIntro(QUESTIONS[m.q + 1].round);
       else if (m.phase === 'question' || m.phase === 'closed') html = vQuestion(m.q, QUESTIONS[m.q]);
       else if (m.phase === 'reveal') html = vReveal(m.q, QUESTIONS[m.q]);
+      else if (m.phase === 'qboard') html = vQBoard(m.q);
       else if (m.phase === 'board') html = vBoard(m.q);
       else if (m.phase === 'final') html = vFinal(m.fstep);
       view.className = 'view v-' + m.phase;
@@ -1010,7 +1047,7 @@ function Host(root, store, opts) {
       const t = view.querySelector('[data-live=teams]'); if (t) t.textContent = nT;
       view.classList.toggle('closed', m.phase === 'closed');
     }
-    const labels = { lobby: '대기실', intro: '라운드 안내', question: `Q${m.q + 1} 진행 중`, closed: `Q${m.q + 1} 마감`, reveal: `Q${m.q + 1} 정답`, board: `Q${m.q + 1} 순위`, final: `최종 발표 ${m.fstep}/5` };
+    const labels = { lobby: '대기실', intro: '라운드 안내', question: `Q${m.q + 1} 진행 중`, closed: `Q${m.q + 1} 마감`, reveal: `Q${m.q + 1} 정답`, qboard: `Q${m.q + 1} 이번 문제 순위`, board: `Q${m.q + 1} 전체 순위`, final: `최종 발표 ${m.fstep}/5` };
     if (!deck || mode === 'quiz') hphase.textContent = labels[m.phase] || '';
     tick();
   }
@@ -1110,6 +1147,7 @@ function Tablet(root, store, opts) {
     else if (m.phase === 'question') k = 'q' + m.q + (myAns(m.q) ? 's' : '');
     else if (m.phase === 'closed') k = 'c' + m.q;
     else if (m.phase === 'reveal') k = 'r' + m.q;
+    else if (m.phase === 'qboard') k = 'qb' + m.q;
     else if (m.phase === 'board') k = 'b' + m.q;
     else k = 'f' + (m.fstep >= 5 ? 5 : 0);
     if (k === key) return tickT();
@@ -1120,7 +1158,7 @@ function Tablet(root, store, opts) {
     else if (m.phase === 'question') html = vQuestion(m.q, QUESTIONS[m.q]);
     else if (m.phase === 'closed') html = vClosed(m.q, QUESTIONS[m.q]);
     else if (m.phase === 'reveal') html = vReveal(m.q, QUESTIONS[m.q]);
-    else if (m.phase === 'board') html = vBoard(m.q);
+    else if (m.phase === 'board' || m.phase === 'qboard') html = vBoard(m.q);
     else html = vFinal(m.fstep);
     el.innerHTML = html;
     tickT();
