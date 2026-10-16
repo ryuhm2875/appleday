@@ -639,7 +639,12 @@ const QUESTIONS = [
       [S('circle','blue',0), S('square','red',2), S('star','yellow',4), S('triangle','green',6), S('circle','red',8)],
       [S('circle','red',0), S('square','blue',2), S('star','green',4), S('triangle','yellow',6), S('circle','blue',8)],
       [S('circle','red',0), S('square','blue',2), S('star','yellow',4), S('triangle','green',6), S('circle','blue',8)] ] },
-  // 12~18 학생 설문
+  { round: 1, type: 'mc', kind: '그림 묘사', draw: true, answer: 0, time: T1, options: [
+      [S('circle','red',0), S('triangle','blue',1), S('square','yellow',3), S('star','green',5), S('circle','yellow',7), S('triangle','red',8)],
+      [S('circle','red',0), S('triangle','blue',1), S('square','yellow',3), S('star','green',5), S('circle','yellow',7), S('triangle','red',6)],
+      [S('circle','red',0), S('triangle','blue',1), S('square','yellow',5), S('star','green',3), S('circle','yellow',7), S('triangle','red',8)],
+      [S('circle','blue',0), S('triangle','red',1), S('square','yellow',3), S('star','green',5), S('circle','yellow',7), S('triangle','red',8)] ] },
+  // 14~20 학생 설문
   { round: 2, type: 'text', kind: '학생 설문', prompt: '고흥대서중 학생들이 1교시 수업으로 가장 원하는 과목은?', answer: '체육', time: TS_ },
   { round: 2, type: 'text', kind: '학생 설문', prompt: '고흥대서중 학생들의 최애 급식 메뉴 1위는?', answer: '치킨', time: TS_ },
   { round: 2, type: 'text', kind: '학생 설문', prompt: '고흥대서중 학생들이 두 번째로 좋아하는 시간은?', answer: '점심시간', time: TS_ },
@@ -647,7 +652,7 @@ const QUESTIONS = [
   { round: 2, type: 'text', kind: '학생 설문', prompt: '고흥대서중 학생들이 뽑은 가장 착한 학생은?', answer: '정상룡', time: TS_ },
   { round: 2, type: 'text', kind: '학생 설문', prompt: '고흥대서중 학생들이 가장 좋아하는 장소는?', answer: '체육관', time: TS_ },
   { round: 2, type: 'text', kind: '학생 설문', prompt: '고흥대서중 학생들이 가장 원하는 장소는?', answer: '매점', time: TS_ },
-  // 19~28 인물 퀴즈
+  // 21~30 인물 퀴즈
   ...['박준희', '이내영', '박지호', '조성준', '하정훈', '이진혁', '이정율', '정상룡', '박시우', '이재호'].map((name, k) => ({ round: 2, type: 'text', kind: '인물 퀴즈', video: `media/p${k + 1}.mp4`, answer: name, time: TP }))
 ];
 const NQ = QUESTIONS.length;
